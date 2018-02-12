@@ -118,7 +118,7 @@ cc_r = [1 0.2 0.2]; % red
 mksz = 30;
 figure; clf; set(gcf,'color','w')
 for ii = 1:num_state
-    subplottight(M,N,ii); hold on
+    subplot(M,N,ii); hold on
     scatter(coords(:,1),-coords(:,2),mksz,'k');
     scatter(coords(pool_svd{ii},1),-coords(pool_svd{ii},2),mksz,cc_lr,'filled');
     scatter(coords(core_svd{ii},1),-coords(core_svd{ii},2),mksz,cc_r,'filled');
