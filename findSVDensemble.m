@@ -118,19 +118,19 @@ cc_r = [1 0.2 0.2]; % red
 mksz = 30;
 figure; clf; set(gcf,'color','w')
 for ii = 1:num_state
-    subplot(M,N,ii); hold on
+    subplottight(M,N,ii); hold on
     scatter(coords(:,1),-coords(:,2),mksz,'k');
     scatter(coords(pool_svd{ii},1),-coords(pool_svd{ii},2),mksz,cc_lr,'filled');
     scatter(coords(core_svd{ii},1),-coords(core_svd{ii},2),mksz,cc_r,'filled');
-    title(['ensemble #' num2str(n)]);
-    axis off equal
+    title(['ensemble #' num2str(ii)]);
+    axis equal off
 end
 
 %% plot calcium transients of core cells
 if ~isempty(F) 
     figure; set(gcf,'color','w')
     for ii = 1:num_state
-        subplot(1,num_state,n); hold on
+        subplot(1,num_state,ii); hold on
         F_core = F(core_svd{ii},:); sc = 0.5;
         sz = size(F_core);
         offset = repmat((1:sz(1))',1,sz(2));
