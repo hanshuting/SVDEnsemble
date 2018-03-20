@@ -1,13 +1,10 @@
-function [core_svd,state_pks_full,param] = findSVDensemble(data,coords,F,param)
+function [core_svd,state_pks_full,param] = findSVDensemble(data,coords,param)
 % Find ensembles using SVD method.
 % INPUT:
 %     data: N-by-T binary spike matrix, where N is the number of neurons,
 %         T is number of frames
 %     coords: N-by-2 matrix, containing coordinates of corresponding
 %         neurons (for visualization purpose only)
-%     F: N-by-T matrix, containing the calcium transients of cells. For
-%         visualization purpose only; leave it empty if you don't want to
-%         plot the calcium signals.
 %     param: struct with the following fields:
 %         - pks: significant level of spike count per frame, default 4,
 %                leave it empty [] if you want an automated threshold
@@ -134,22 +131,6 @@ for ii = 1:num_state
     scatter(coords(core_svd{ii},1),-coords(core_svd{ii},2),mksz,cc_r,'filled');
     title(['ensemble #' num2str(ii)]);
     axis off equal
-end
-
-%% plot calcium transients of core cells
-if ~isempty(F) 
-    figure; set(gcf,'color','w')
-    for ii = 1:num_state
-        subplot(1,num_state,n); hold on
-        F_core = F(core_svd{ii},:); sc = 0.5;
-        sz = size(F_core);
-        offset = repmat((1:sz(1))',1,sz(2));
-        plot(1:sz(2),F_core+sc*offset);
-        xlim([1 sz(2)]); ylim([0 (sz(1)+1)*sc]);
-        xlabel('Time (frame)'); ylabel('Cell');
-        title(['core #' num2str(n)]);
-%         set(gca,'ytick',1:length(core));
-    end
 end
 
 %% update parameters for output
