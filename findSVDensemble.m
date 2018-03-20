@@ -1,4 +1,4 @@
-function [core_svd] = findSVDensemble(data,coords,F,param)
+function [core_svd,state_pks_full,param] = findSVDensemble(data,coords,F,param)
 % Find ensembles using SVD method.
 % INPUT:
 %     data: N-by-T binary spike matrix, where N is the number of neurons,
@@ -15,10 +15,15 @@ function [core_svd] = findSVDensemble(data,coords,F,param)
 %                empty [] if you want an automated threshold
 %         - jcut: another threshold for coactivity: further removes noise;
 %                default 0.06
-%         - state_cut: maximum number of states allowed
+%         - state_cut: maximum number of states allowed, leave it empty if
+%                you want automated value
 % OUTPUT:
 %     core_svd: K-by-1 cell array, where K is the number of identified
 %         ensembles, with the indices of core neurons in each ensemble
+%     state_pks_full: 1-by-T vector with the active ensemble identity for
+%         each frame
+%     param: updated parameter structure with the actual values this code
+%         used
 % 
 % For details about this method, see the following paper:
 % Carrillo-Reid, et al. "Endogenous sequential cortical activity evoked by
@@ -39,6 +44,7 @@ pks = param.pks;
 ticut = param.ticut;
 jcut = param.jcut;
 state_cut = param.state_cut;
+if isempty(state_cut); state_cut = round(size(data,1)/4); end
 
 %% find similarity structure
 % find high-activity frames
@@ -67,6 +73,10 @@ js = 1-pdist2(S_tib,S_tib,'jaccard');
 % Find the peaks in the states and the cells in the states
 [state_raster,state_pks,fac_cut] = SVDStateBinary(double(js>jcut),state_cut);
 num_state = size(state_raster,2);
+
+% get state from full dataset
+state_pks_full = zeros(1,size(data,2));
+state_pks_full(pk_indx) = state_pks;
 
 % plot
 figure; set(gcf,'color','w')
@@ -123,14 +133,14 @@ for ii = 1:num_state
     scatter(coords(pool_svd{ii},1),-coords(pool_svd{ii},2),mksz,cc_lr,'filled');
     scatter(coords(core_svd{ii},1),-coords(core_svd{ii},2),mksz,cc_r,'filled');
     title(['ensemble #' num2str(ii)]);
-    axis equal off
+    axis off equal
 end
 
 %% plot calcium transients of core cells
 if ~isempty(F) 
     figure; set(gcf,'color','w')
     for ii = 1:num_state
-        subplot(1,num_state,ii); hold on
+        subplot(1,num_state,n); hold on
         F_core = F(core_svd{ii},:); sc = 0.5;
         sz = size(F_core);
         offset = repmat((1:sz(1))',1,sz(2));
@@ -141,5 +151,11 @@ if ~isempty(F)
 %         set(gca,'ytick',1:length(core));
     end
 end
+
+%% update parameters for output
+param.pks = pks;
+param.ticut = ticut;
+param.jcut = jcut;
+param.state_cut = state_cut;
 
 end
