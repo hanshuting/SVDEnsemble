@@ -18,7 +18,7 @@ This repo is based on Luis Carrillo-Reid's Stoixeion package (forked under https
 
 Usage
 --------
-Call function `core_svd = findSVDensemble(data,coords,F,param)`, and see the function for more explanations.
+Call function `[core_svd,state_pks,param] = findSVDensemble(data,coords,param)`, and see the function for more explanations.
 
 Reference
 --------
